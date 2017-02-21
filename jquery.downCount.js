@@ -1,14 +1,20 @@
 /**
  * downCount: Simple Countdown clock with offset
  * Author: Sonny T. <hi@sonnyt.com>, sonnyt.com
+ * @@history wupj 2017/2/20 17:34
+ * 修改内容：增加指定时间的提醒函数操作 warning 单位秒
+ * warningFun 要执行的函数
  */
 
 (function ($) {
 
     $.fn.downCount = function (options, callback) {
+        // 设置是否已经提醒过
         var settings = $.extend({
                 date: null,
-                offset: null
+                offset: null,
+                warning:[], // 提醒的秒数,对应warningFun里的函数
+                warningFun:[] // 对应warning的秒数
             }, options);
 
         // Throw error if date is not set
@@ -50,9 +56,8 @@
 
             // difference of dates
             var difference = target_date - current_date;
-
             // if difference is negative than it's pass the target date
-            if (difference < 0) {
+             if (difference < 0) {
                 // stop timer
                 clearInterval(interval);
 
@@ -60,6 +65,14 @@
 
                 return;
             }
+            for (var i=0;i<settings.warning.length;i++){
+                if(difference < settings.warning[i]*1000){
+                    settings.warning[i]=-10000;
+                    var doSomething=settings.warningFun[i];
+                    if (doSomething && typeof doSomething === 'function') doSomething();
+                }
+            }
+
 
             // basic math variables
             var _second = 1000,
